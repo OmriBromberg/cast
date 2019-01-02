@@ -1234,7 +1234,10 @@ func ToDurationSliceE(i interface{}) ([]time.Duration, error) {
 // predefined list of layouts.  If no suitable format is found, an error is
 // returned.
 func StringToDate(s string, layouts ...string) (civil.Date, error) {
-	layouts = append(layouts, []string{"2006-01-02"}...)
+	layouts = append(layouts, []string{
+		"2006-01-02",
+		"1/2/2006",
+	}...)
 	t, err := parseTimeWith(s, layouts)
 	if err != nil {
 		return civil.Date{}, err
@@ -1247,7 +1250,12 @@ func StringToDate(s string, layouts ...string) (civil.Date, error) {
 // predefined list of layouts.  If no suitable format is found, an error is
 // returned.
 func StringToDateTime(s string, layouts ...string) (civil.DateTime, error) {
-	layouts = append(layouts, []string{"2006-01-02T15:04:05.999999999", "2006-01-02t15:04:05.999999999"}...)
+	layouts = append(layouts, []string{
+		"2006-01-02T15:04:05.999999999",
+		"2006-01-02t15:04:05.999999999",
+		"1/2/2006 15:04",
+		"1/2/2006",
+	}...)
 	t, err := parseTimeWith(s, layouts)
 	if err != nil {
 		return civil.DateTime{}, err

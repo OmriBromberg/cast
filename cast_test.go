@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"cloud.google.com/go/civil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -1171,6 +1172,64 @@ func TestIndirectPointers(t *testing.T) {
 
 	assert.Equal(t, ToInt(y), 13)
 	assert.Equal(t, ToInt(z), 13)
+}
+
+func TestToDateE(t *testing.T) {
+	tests := []struct {
+		input  interface{}
+		expect civil.Date
+		iserr  bool
+	}{
+		{"2019-01-02", civil.Date{2019, time.January, 2}, false},
+		// errors
+		{"0000-00-00", civil.Date{}, true},
+	}
+
+	for i, test := range tests {
+		errmsg := fmt.Sprintf("i = %d", i) // assert helper message
+
+		v, err := ToDateE(test.input)
+		if test.iserr {
+			assert.Error(t, err, errmsg)
+			continue
+		}
+
+		assert.NoError(t, err, errmsg)
+		assert.Equal(t, test.expect, v, errmsg)
+
+		// Non-E test
+		v = ToDate(test.input)
+		assert.Equal(t, test.expect, v, errmsg)
+	}
+}
+
+func TestToDateTimeE(t *testing.T) {
+	tests := []struct {
+		input  interface{}
+		expect civil.DateTime
+		iserr  bool
+	}{
+		{"2019-01-02t15:04:05.999999999", civil.DateTime{civil.Date{2019, time.January, 2}, civil.Time{15, 4, 5, 999999999}}, false},
+		// errors
+		{"", civil.DateTime{}, true},
+	}
+
+	for i, test := range tests {
+		errmsg := fmt.Sprintf("i = %d", i) // assert helper message
+
+		v, err := ToDateTimeE(test.input)
+		if test.iserr {
+			assert.Error(t, err, errmsg)
+			continue
+		}
+
+		assert.NoError(t, err, errmsg)
+		assert.Equal(t, test.expect, v, errmsg)
+
+		// Non-E test
+		v = ToDateTime(test.input)
+		assert.Equal(t, test.expect, v, errmsg)
+	}
 }
 
 func TestToTimeEE(t *testing.T) {

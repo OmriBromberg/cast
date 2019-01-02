@@ -14,19 +14,49 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/civil"
 )
 
 var errNegativeNotAllowed = errors.New("unable to cast negative value")
 
+// ToDateE casts an interface to a civil.Date type.
+func ToDateE(i interface{}, layouts ...string) (dt civil.Date, err error) {
+	i = indirect(i)
+
+	switch v := i.(type) {
+	case civil.Date:
+		return v, nil
+	case string:
+		return StringToDate(v, layouts...)
+	default:
+		return civil.Date{}, fmt.Errorf("unable to cast %#v of type %T to Date", i, i)
+	}
+}
+
+// ToDateTimeE casts an interface to a civil.DateTime type.
+func ToDateTimeE(i interface{}, layouts ...string) (dt civil.DateTime, err error) {
+	i = indirect(i)
+
+	switch v := i.(type) {
+	case civil.DateTime:
+		return v, nil
+	case string:
+		return StringToDateTime(v, layouts...)
+	default:
+		return civil.DateTime{}, fmt.Errorf("unable to cast %#v of type %T to DateTime", i, i)
+	}
+}
+
 // ToTimeE casts an interface to a time.Time type.
-func ToTimeE(i interface{}) (tim time.Time, err error) {
+func ToTimeE(i interface{}, layouts ...string) (tim time.Time, err error) {
 	i = indirect(i)
 
 	switch v := i.(type) {
 	case time.Time:
 		return v, nil
 	case string:
-		return StringToDate(v)
+		return StringToTime(v, layouts...)
 	case int:
 		return time.Unix(int64(v), 0), nil
 	case int64:
@@ -1200,11 +1230,37 @@ func ToDurationSliceE(i interface{}) ([]time.Duration, error) {
 	}
 }
 
-// StringToDate attempts to parse a string into a time.Time type using a
-// predefined list of formats.  If no suitable format is found, an error is
+// StringToDate attempts to parse a string into a civil.Date type using a
+// predefined list of layouts.  If no suitable format is found, an error is
 // returned.
-func StringToDate(s string) (time.Time, error) {
-	return parseDateWith(s, []string{
+func StringToDate(s string, layouts ...string) (civil.Date, error) {
+	layouts = append(layouts, []string{"2006-01-02"}...)
+	t, err := parseTimeWith(s, layouts)
+	if err != nil {
+		return civil.Date{}, err
+	}
+
+	return civil.DateOf(t), nil
+}
+
+// StringToDateTime attempts to parse a string into a civil.DateTime type using a
+// predefined list of layouts.  If no suitable format is found, an error is
+// returned.
+func StringToDateTime(s string, layouts ...string) (civil.DateTime, error) {
+	layouts = append(layouts, []string{"2006-01-02T15:04:05.999999999", "2006-01-02t15:04:05.999999999"}...)
+	t, err := parseTimeWith(s, layouts)
+	if err != nil {
+		return civil.DateTime{}, err
+	}
+
+	return civil.DateTimeOf(t), nil
+}
+
+// StringToTime attempts to parse a string into a time.Time type using a
+// predefined list of layouts.  If no suitable format is found, an error is
+// returned.
+func StringToTime(s string, layouts ...string) (time.Time, error) {
+	layouts = append(layouts, []string{
 		time.RFC3339,
 		"2006-01-02T15:04:05", // iso8601 without timezone
 		time.RFC1123Z,
@@ -1229,12 +1285,13 @@ func StringToDate(s string) (time.Time, error) {
 		time.StampMilli,
 		time.StampMicro,
 		time.StampNano,
-	})
+	}...)
+	return parseTimeWith(s, layouts)
 }
 
-func parseDateWith(s string, dates []string) (d time.Time, e error) {
-	for _, dateType := range dates {
-		if d, e = time.Parse(dateType, s); e == nil {
+func parseTimeWith(s string, layouts []string) (d time.Time, e error) {
+	for _, layout := range layouts {
+		if d, e = time.Parse(layout, s); e == nil {
 			return
 		}
 	}

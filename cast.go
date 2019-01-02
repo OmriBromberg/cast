@@ -6,11 +6,27 @@
 // Package cast provides easy and safe casting in Go.
 package cast
 
-import "time"
+import (
+	"time"
+
+	"cloud.google.com/go/civil"
+)
 
 // ToBool casts an interface to a bool type.
 func ToBool(i interface{}) bool {
 	v, _ := ToBoolE(i)
+	return v
+}
+
+// ToDate casts an interface to a civil.Date type.
+func ToDate(i interface{}) civil.Date {
+	v, _ := ToDateE(i)
+	return v
+}
+
+// ToDateTime casts an interface to a civil.DateTime type.
+func ToDateTime(i interface{}) civil.DateTime {
+	v, _ := ToDateTimeE(i)
 	return v
 }
 

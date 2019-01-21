@@ -27,6 +27,8 @@ func ToDateE(i interface{}, layouts ...string) (dt civil.Date, err error) {
 	switch v := i.(type) {
 	case civil.Date:
 		return v, nil
+	case time.Time:
+		return civil.DateOf(v), nil
 	case string:
 		return StringToDate(v, layouts...)
 	default:
@@ -41,6 +43,8 @@ func ToDateTimeE(i interface{}, layouts ...string) (dt civil.DateTime, err error
 	switch v := i.(type) {
 	case civil.DateTime:
 		return v, nil
+	case time.Time:
+		return civil.DateTimeOf(v), nil
 	case string:
 		return StringToDateTime(v, layouts...)
 	default:

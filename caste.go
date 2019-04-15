@@ -155,6 +155,7 @@ func ToFloat64E(i interface{}) (float64, error) {
 	case uint8:
 		return float64(s), nil
 	case string:
+		s = strings.Replace(s, ",", "", -1)
 		v, err := strconv.ParseFloat(s, 64)
 		if err == nil {
 			return v, nil
@@ -433,6 +434,7 @@ func ToIntE(i interface{}) (int, error) {
 	case float32:
 		return int(s), nil
 	case string:
+		s = strings.Replace(s, ",", "", -1)
 		v, err := strconv.ParseInt(s, 0, 0)
 		if err == nil {
 			return int(v), nil

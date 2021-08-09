@@ -1259,7 +1259,6 @@ func StringToDateTime(s string, layouts ...string) (civil.DateTime, error) {
 	layouts = append(layouts, []string{
 		"2006-01-02T15:04:05.999999999",
 		"2006-01-02t15:04:05.999999999",
-		"2006-01-02 15:04:05.999999 UTC",
 		"1/2/2006 15:04",
 		"1/2/2006",
 	}...)

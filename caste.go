@@ -1259,6 +1259,7 @@ func StringToDateTime(s string, layouts ...string) (civil.DateTime, error) {
 	layouts = append(layouts, []string{
 		"2006-01-02T15:04:05.999999999",
 		"2006-01-02t15:04:05.999999999",
+		"2006-01-02 15:04:05.999999 UTC",
 		"1/2/2006 15:04",
 		"1/2/2006",
 	}...)
@@ -1277,6 +1278,7 @@ func StringToTime(s string, layouts ...string) (time.Time, error) {
 	layouts = append(layouts, []string{
 		time.RFC3339,
 		"2006-01-02T15:04:05", // iso8601 without timezone
+		"2006-01-02 15:04:05.999999 UTC",
 		time.RFC1123Z,
 		time.RFC1123,
 		time.RFC822Z,
